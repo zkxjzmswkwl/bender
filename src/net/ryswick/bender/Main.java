@@ -49,7 +49,7 @@ public class Main {
         BufferedReader reader = new BufferedReader(input);
 
         for (;;) {
-            System.out.println("> ");
+            System.out.printf("> ");
             String line = reader.readLine();
             if (line == null)   break;
             run(line);
@@ -61,11 +61,10 @@ public class Main {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
         Parser parser = new Parser(tokens);
-        Expression expression = parser.parse();
+        List<Statement> statements = parser.parse();
 
         if (hadError) return;
-        interpreter.interpret(expression);
-//        System.out.println(new AstPrinter().print(expression));
+        interpreter.interpret(statements);
     }
 
     static void error(int line, String message) {

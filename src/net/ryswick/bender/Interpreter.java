@@ -1,15 +1,34 @@
 package net.ryswick.bender;
 
-public class Interpreter implements Expression.Visitor<Object> {
+import java.util.List;
 
-    void interpret(Expression expression) {
+public class Interpreter implements Expression.Visitor<Object>,
+                                    Statement.Visitor<Void> {
+
+
+    private Environment environment = new Environment();
+
+    void interpret(List<Statement> statements) {
         try {
-            Object value = evaluate(expression);
-            System.out.println(stringify(value));
+            for (Statement statement : statements) {
+                execute(statement);
+            }
         } catch (RuntimeError error) {
             Main.runtimeError(error);
         }
     }
+
+    private void execute(Statement statement) {
+        statement.accept(this);
+    }
+
+    @Override
+    public Object visitAssignExpression(Expression.Assign expression) {
+        Object value = evaluate(expression.value);
+        environment.assign(expression.name, value);
+        return value;
+    }
+
     @Override
     public Object visitBinaryExpression(Expression.Binary expression) {
         Object left = evaluate(expression.left);
@@ -78,6 +97,55 @@ public class Interpreter implements Expression.Visitor<Object> {
         // Will not execute.
         return null;
     }
+
+    @Override
+    public Void visitBlockStatement(Statement.Block statement) {
+        executeBlock(statement.statements, new Environment(environment));
+        return null;
+    }
+
+    @Override
+    public Void visitExprStatement(Statement.Expr statement) {
+        evaluate(statement.expression);
+        return null;
+    }
+
+    @Override
+    public Void visitPrintStatement(Statement.Print statement) {
+        Object value = evaluate(statement.expression);
+        System.out.println(stringify(value));
+        return null;
+    }
+
+    @Override
+    public Object visitVariableExpression(Expression.Variable expression) {
+        return environment.get(expression.name);
+    }
+
+    @Override
+    public Void visitVarStatement(Statement.Var statement) {
+        Object value = null;
+        if (statement.initializer != null) {
+            value = evaluate(statement.initializer);
+        }
+
+        environment.define(statement.name.lexeme, value);
+        return null;
+    }
+
+    void executeBlock(List<Statement> statements, Environment environment) {
+        Environment previous = this.environment;
+        try {
+            this.environment = environment;
+
+            for (Statement statement : statements) {
+                execute(statement);
+            }
+        } finally {
+            this.environment = previous;
+        }
+    }
+
 
     private Object evaluate(Expression expression) {
         return expression.accept(this);
