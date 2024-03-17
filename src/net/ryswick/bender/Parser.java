@@ -74,7 +74,6 @@ public class Parser {
     }
     private Expression expression() {
         return assignment();
-//        return equality();
     }
 
     private Expression assignment() {
