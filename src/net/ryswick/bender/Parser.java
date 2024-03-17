@@ -14,21 +14,11 @@ public class Parser {
         this.tokens = tokens;
     }
 
-//    Expression parse() {
-//        try {
-//            return expression();
-//        } catch (ParseError error) {
-//            return null;
-//        }
-//    }
-
     List<Statement> parse() {
         List<Statement> statements = new ArrayList<>();
         while (!eofReached()) {
             statements.add(declaration());
-            statements.add(statement());
         }
-
         return statements;
     }
 
@@ -45,9 +35,11 @@ public class Parser {
     private Statement varDeclaration() {
         Token name = consume(IDENTIFIER, "Expect variable name.");
         Expression initializer = null;
+
         if (match(EQUAL)) {
             initializer = expression();
         }
+
         consume(SEMICOLON, "Expect ';' after variable declaration.");
         return new Statement.Var(name, initializer);
     }
@@ -93,7 +85,6 @@ public class Parser {
             Expression value = assignment();
             if (expression instanceof Expression.Variable) {
                 Token name = ((Expression.Variable)expression).name;
-                System.out.println("DBEUG");
                 return new Expression.Assign(name, value);
             }
             error(equals, "Invalid assignment target.");
@@ -201,7 +192,6 @@ public class Parser {
         }
 
         if (match(IDENTIFIER)) {
-            System.out.println("IDENTIFIER");
             return new Expression.Variable(previous());
         }
 

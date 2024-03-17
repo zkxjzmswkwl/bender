@@ -42,7 +42,7 @@ public class Main {
         run(new String(bytes, Charset.defaultCharset()));
         if (hadError)   System.exit(65);
         if (hadRuntimeError) System.exit(70);
-    }
+}
 
     private static void runPrompt() throws IOException {
         InputStreamReader input = new InputStreamReader(System.in);
