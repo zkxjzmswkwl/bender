@@ -1,0 +1,29 @@
+{
+  "name": "bender",
+  "displayName": "Bender",
+  "description": "Bender language support.",
+  "version": "0.0.2",
+  "engines": {
+    "vscode": "^1.87.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "bender",
+      "aliases": ["Bender", "bender"],
+      "extensions": [".ben"],
+      "configuration": "./language-configuration.json",
+      "icon": {
+        "light": "Bender.png",
+        "dark": "Bender.png"
+      }
+    }],
+    "grammars": [{
+      "language": "bender",
+      "scopeName": "source.bender",
+      "path": "./syntaxes/bender.tmLanguage.json"
+    }]
+  }
+}
