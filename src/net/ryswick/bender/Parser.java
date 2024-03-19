@@ -45,10 +45,24 @@ public class Parser {
     }
 
     private Statement statement() {
+        if (match(IF)) return ifStatement();
         if (match(PRINT)) return printStatement();
         if (match(FUCKIT)) return fuckitStatement();
         if (match(LEFT_BRACE)) return new Statement.Block(block());
         return expressionStatement();
+    }
+
+    private Statement ifStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'if'.");
+        Expression condition = expression();
+        consume(RIGHT_PAREN, "Expect ')' after if condition.");
+
+        Statement thenBranch = statement();
+        Statement elseBranch = null;
+        if (match(ELSE)) {
+            elseBranch = statement();
+        }
+        return new Statement.If(condition, thenBranch, elseBranch);
     }
 
     private Statement fuckitStatement() {
@@ -84,7 +98,8 @@ public class Parser {
     }
 
     private Expression assignment() {
-        Expression expression = equality();
+        // Expression expression = equality();
+        Expression expression = or();
 
         if (match(EQUAL)) {
             Token equals = previous();
@@ -95,6 +110,30 @@ public class Parser {
             }
             error(equals, "Invalid assignment target.");
         }
+        return expression;
+    }
+
+    private Expression or() {
+        Expression expression = and();
+
+        while (match(OR)) {
+            Token operator = previous();
+            Expression right = and();
+            expression = new Expression.Logical(expression, operator, right);
+        }
+
+        return expression;
+    }
+
+    private Expression and() {
+        Expression expression = equality();
+
+        while (match(AND)) {
+            Token operator = previous();
+            Expression right = equality();
+            expression = new Expression.Logical(expression, operator, right);
+        }
+
         return expression;
     }
 

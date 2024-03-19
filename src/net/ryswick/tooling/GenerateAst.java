@@ -15,17 +15,19 @@ public class GenerateAst {
         }
         String outputDir = args[0];
         defineAst(outputDir, "Expression", Arrays.asList(
-                "Assign   : Token name, Expression value",
-                "Binary   : Expression left, Token operator, Expression right",
-                "Grouping : Expression expression",
-                "Literal  : Object value",
-                "Unary    : Token operator, Expression right",
-                "Variable : Token name"
+            "Assign   : Token name, Expression value",
+            "Binary   : Expression left, Token operator, Expression right",
+            "Grouping : Expression expression",
+            "Literal  : Object value",
+            "Logical  : Expression left, Token operator, Expression right",
+            "Unary    : Token operator, Expression right",
+            "Variable : Token name"
         ));
 
         defineAst(outputDir, "Statement", Arrays.asList(
             "Block      : List<Statement> statements",
             "Expr       : Expression expression",
+            "If         : Expression condition, Statement thenBranch, Statement elseBranch",
             "Print      : Expression expression",
             "Fuckit     : Expression expression",
             "Var        : Token name, Expression initializer"

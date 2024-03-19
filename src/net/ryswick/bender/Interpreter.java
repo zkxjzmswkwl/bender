@@ -131,6 +131,16 @@ public class Interpreter implements Expression.Visitor<Object>,
     }
 
     @Override
+    public Void visitIfStatement(Statement.If statement) {
+        if (isTruthy(evaluate(statement.condition))) {
+            execute(statement.thenBranch);
+        } else if (statement.elseBranch != null) {
+            execute(statement.elseBranch);
+        }
+        return null;
+    }
+
+    @Override
     public Object visitVariableExpression(Expression.Variable expression) {
         return environment.get(expression.name);
     }
@@ -144,6 +154,19 @@ public class Interpreter implements Expression.Visitor<Object>,
 
         environment.define(statement.name.lexeme, value);
         return null;
+    }
+
+    @Override
+    public Object visitLogicalExpression(Expression.Logical expression) {
+        Object left = evaluate(expression.left);
+        
+        if (expression.operator.type == EToken.OR) {
+            if (isTruthy(left)) return left;
+        } else {
+            if (!isTruthy(left)) return left;
+        }
+    
+        return evaluate(expression.right);
     }
 
     void executeBlock(List<Statement> statements, Environment environment) {

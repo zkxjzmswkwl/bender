@@ -1,14 +1,4 @@
-fuckit(69);
-val testAssignment = "I'm assigned to shit";
-print testAssignment;
-print "Test printing of string";
-print "Test subsequent print.";
-print 2 + 2;
-
-// Scope testing (also comment testing as it happens.)
-{
-  val testAssignment = 691337;
-  print testAssignment;
+val myName = "Coomdalf the gay";
+if (myName == "Carter" or myName == "Coomdalf the gay") {
+  print "Dude, nice name!";
 }
-
-print testAssignment;

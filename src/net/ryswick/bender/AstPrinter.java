@@ -37,6 +37,11 @@ public class AstPrinter implements Expression.Visitor<String> {
         return null;
     }
 
+    @Override
+    public String visitLogicalExpression(Expression.Logical expression) {
+        return null;
+    }
+
     private String parenthesize(String name, Expression... expressions) {
         StringBuilder builder = new StringBuilder();
 
