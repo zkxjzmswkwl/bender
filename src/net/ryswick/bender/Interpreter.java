@@ -124,6 +124,7 @@ public class Interpreter implements Expression.Visitor<Object>,
             System.exit(val.intValue());
         } else {
             Main.error(0, "How does one fuck up fuckit?");
+            System.exit(65);
         }
         // Will not execute.
         return null;
