@@ -118,6 +118,18 @@ public class Interpreter implements Expression.Visitor<Object>,
     }
 
     @Override
+    public Void visitFuckitStatement(Statement.Fuckit statement) {
+        Object value = evaluate(statement.expression);
+        if (value instanceof Double val) {
+            System.exit(val.intValue());
+        } else {
+            Main.error(0, "How does one fuck up fuckit?");
+        }
+        // Will not execute.
+        return null;
+    }
+
+    @Override
     public Object visitVariableExpression(Expression.Variable expression) {
         return environment.get(expression.name);
     }

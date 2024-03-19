@@ -44,6 +44,10 @@
 					"match": "\\b(print)\\b"
 				},
 				{
+					"name": "support.function.builtin.bender",
+					"match": "\\b(fuckit)\\b"
+				},
+				{
 					"name": "variable.language.this.bender",
 					"match": "\\b(this)\\b"
 				},

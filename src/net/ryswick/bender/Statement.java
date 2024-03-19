@@ -7,6 +7,7 @@ abstract class Statement {
         R visitBlockStatement(Block statement);
         R visitExprStatement(Expr statement);
         R visitPrintStatement(Print statement);
+        R visitFuckitStatement(Fuckit statement);
         R visitVarStatement(Var statement);
     }
 
@@ -44,6 +45,19 @@ abstract class Statement {
         @Override
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitPrintStatement(this);
+        }
+
+        final Expression expression;
+    }
+
+    static class Fuckit extends Statement {
+        Fuckit(Expression expression) {
+            this.expression = expression;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitFuckitStatement(this);
         }
 
         final Expression expression;

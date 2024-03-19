@@ -36,6 +36,7 @@ public class Scanner {
         keywords.put("true", TRUE);
         keywords.put("val", VAR);
         keywords.put("while", WHILE);
+        keywords.put("fuckit", FUCKIT);
     }
 
     Scanner(String source) {

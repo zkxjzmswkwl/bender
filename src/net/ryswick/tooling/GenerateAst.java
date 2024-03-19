@@ -27,6 +27,7 @@ public class GenerateAst {
             "Block      : List<Statement> statements",
             "Expr       : Expression expression",
             "Print      : Expression expression",
+            "Fuckit     : Expression expression",
             "Var        : Token name, Expression initializer"
         ));
     }

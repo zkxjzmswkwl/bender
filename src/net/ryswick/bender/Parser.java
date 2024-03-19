@@ -46,8 +46,15 @@ public class Parser {
 
     private Statement statement() {
         if (match(PRINT)) return printStatement();
+        if (match(FUCKIT)) return fuckitStatement();
         if (match(LEFT_BRACE)) return new Statement.Block(block());
         return expressionStatement();
+    }
+
+    private Statement fuckitStatement() {
+        Expression value = expression();
+        consume(SEMICOLON, "Expect ';' after fuckit.");
+        return new Statement.Fuckit(value);
     }
 
     private Statement printStatement() {
