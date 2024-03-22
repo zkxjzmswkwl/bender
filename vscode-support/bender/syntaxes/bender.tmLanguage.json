@@ -48,12 +48,16 @@
 					"match": "\\b(fuckit)\\b"
 				},
 				{
+					"name": "support.function.builtin.bender",
+					"match": "\\b(capture)\\b"
+				},
+				{
 					"name": "variable.language.this.bender",
 					"match": "\\b(this)\\b"
 				},
 				{
 					"name": "variable.language.super.bender",
-					"match": "\\b(super)\\b"
+					"match": "\\b(holla)\\b"
 				}
 			]
 		},

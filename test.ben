@@ -1,4 +1,11 @@
-val myName = "Coomdalf the gay";
-if (myName == "Carter" or myName == "Coomdalf the gay") {
-  print "Dude, nice name!";
+val testAssignment = 20;
+print testAssignment + 5;
+
+if (testAssignment + 5 == 25) {
+  print "testAssignment is 25";
 }
+
+// Technically there is no way to call functions at the moment.
+capture("bigdongs");
+capture "bigdongs";
+// So both of these work fine. ?XD.
