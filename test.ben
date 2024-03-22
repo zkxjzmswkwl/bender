@@ -1,11 +1,5 @@
-val testAssignment = 20;
-print testAssignment + 5;
-
-if (testAssignment + 5 == 25) {
-  print "testAssignment is 25";
+fun test(name) {
+  print name;
 }
 
-// Technically there is no way to call functions at the moment.
-capture("bigdongs");
-capture "bigdongs";
-// So both of these work fine. ?XD.
+test("carter");

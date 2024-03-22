@@ -24,12 +24,32 @@ public class Parser {
 
     private Statement declaration() {
         try {
+            if (match(FUN)) return function("function");
             if (match(VAR)) return varDeclaration();
             return statement();
         } catch (ParseError error) {
             syncrhonize();
             return null;
         }
+    }
+
+    private Statement.Function function(String kind) {
+        Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
+        consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
+        List<Token> parameters = new ArrayList<>();
+        if (!check(RIGHT_PAREN)) {
+            do {
+                if (parameters.size() >= 255) {
+                    error(peek(), "Cannot have more than 255 parameters.");
+                }
+                parameters.add(consume(IDENTIFIER, "Expect parameter name."));
+            } while (match(COMMA));
+        }
+        consume(RIGHT_PAREN, "Expect ')' after parameters.");
+
+        consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
+        List<Statement> body = block();
+        return new Statement.Function(name, parameters, body);
     }
 
     private Statement varDeclaration() {
@@ -230,8 +250,38 @@ public class Parser {
             Expression right = unary();
             return new Expression.Unary(operator, right);
         }
-        return primary();
+        return call();
     }
+
+    private Expression call() {
+        Expression expression = primary();
+
+        while (true) {
+            if (match(LEFT_PAREN)) {
+                expression = finishCall(expression);
+            } else {
+                break;
+            }
+        }
+        return expression;
+    }
+
+    private Expression finishCall(Expression callee) {
+        List<Expression> arguments = new ArrayList<>();
+        if (!check(RIGHT_PAREN)) {
+            do {
+                if (arguments.size() >= 255) {
+                    error(peek(), "Cannot have more than 255 arguments.");
+                }
+                arguments.add(expression());
+            } while (match(COMMA));
+        }
+
+        Token paren = consume(RIGHT_PAREN, "Expect ')' after arguments.");
+
+        return new Expression.Call(callee, paren, arguments);
+    }
+
 
     private Expression primary() {
         if (match(FALSE))   return new Expression.Literal(false);

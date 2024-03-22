@@ -1,5 +1,6 @@
 package net.ryswick.bender;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.ryswick.bender.imaging.Imaging;
@@ -9,7 +10,27 @@ public class Interpreter implements Expression.Visitor<Object>,
                                     Statement.Visitor<Void> {
 
 
-    private Environment environment = new Environment();
+    public Environment globals = new Environment();
+    private Environment environment = globals;
+
+    Interpreter() {
+        globals.define("clock", new BenderCallable() {
+            @Override
+            public int arity() {
+                return 0;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                return (double)System.currentTimeMillis() / 1000.0;
+            }
+
+            @Override
+            public String toString() {
+                return "<native fn>";
+            }
+        });
+    }
 
     void interpret(List<Statement> statements) {
         try {
@@ -181,6 +202,36 @@ public class Interpreter implements Expression.Visitor<Object>,
         }
     
         return evaluate(expression.right);
+    }
+
+    @Override
+    public Object visitCallExpression(Expression.Call expression) {
+        Object callee = evaluate(expression.callee);
+
+        List<Object> arguments = new ArrayList<>();
+        for (Expression argument : expression.arguments) {
+            arguments.add(evaluate(argument));
+        }
+
+        if (!(callee instanceof BenderCallable)) {
+            throw new RuntimeError(
+                expression.paren, "Can only call functions and classes.");
+        }
+
+        BenderCallable function = (BenderCallable)callee;
+
+        if (arguments.size() != function.arity()) {
+            throw new RuntimeError(expression.paren, "Expected " +
+                function.arity() + " arguments but got " + arguments.size() + ".");
+        }
+        return function.call(this, arguments);
+    }
+
+    @Override
+    public Void visitFunctionStatement(Statement.Function statement) {
+        BenderFunction function = new BenderFunction(statement);
+        environment.define(statement.name.lexeme, function);
+        return null;
     }
 
     void executeBlock(List<Statement> statements, Environment environment) {
