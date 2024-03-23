@@ -2,6 +2,9 @@ package net.ryswick.bender;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.Robot;
 
 import net.ryswick.bender.imaging.Imaging;
 import net.ryswick.bender.imaging.Position;
@@ -12,6 +15,7 @@ public class Interpreter implements Expression.Visitor<Object>,
 
     public Environment globals = new Environment();
     private Environment environment = globals;
+    static Robot robot = null;
 
     Interpreter() {
         globals.define("clock", new BenderCallable() {
@@ -23,6 +27,87 @@ public class Interpreter implements Expression.Visitor<Object>,
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
                 return (double)System.currentTimeMillis() / 1000.0;
+            }
+
+            @Override
+            public String toString() {
+                return "<native fn>";
+            }
+        });
+
+        globals.define("moveMouse", new BenderCallable() {
+            @Override
+            public int arity() {
+                return 2;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                if (robot == null) {
+                    try {
+                        robot = new Robot();
+                    } catch (Exception e) {
+                        Main.error(0, "Robot boom~");
+                    }
+                }
+                if (arguments.get(0) instanceof Double x && arguments.get(1) instanceof Double y) {
+                    robot.mouseMove(x.intValue(), y.intValue());
+                } else {
+                    Main.error(0, "moveMouse requires two numbers.");
+                }
+                return null;
+            }
+
+            @Override
+            public String toString() {
+                return "<native fn>";
+            }
+        });
+
+        globals.define("leftClick", new BenderCallable() {
+            @Override
+            public int arity() {
+                return 0;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                if (robot == null) {
+                    try {
+                        robot = new Robot();
+                    } catch (Exception e) {
+                        Main.error(0, "Robot boom~");
+                    }
+                }
+                robot.mousePress(java.awt.event.InputEvent.BUTTON1_DOWN_MASK);
+                robot.mouseRelease(java.awt.event.InputEvent.BUTTON1_DOWN_MASK);
+                return null;
+            }
+
+            @Override
+            public String toString() {
+                return "<native fn>";
+            }
+        });
+
+        globals.define("getCursorPos", new BenderCallable() {
+            @Override
+            public int arity() {
+                return 0;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                if (robot == null) {
+                    try {
+                        robot = new Robot();
+                    } catch (Exception e) {
+                        Main.error(0, "Robot boom~");
+                    }
+                }
+
+                Point pos = MouseInfo.getPointerInfo().getLocation();
+                return String.format("(%d, %d)", pos.x, pos.y);
             }
 
             @Override

@@ -2,4 +2,9 @@ fun test(name) {
   print name;
 }
 
-test("carter");
+fun exitProgram() {
+  moveMouse(2535, 19);
+  leftClick();
+}
+
+exitProgram();

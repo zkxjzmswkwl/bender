@@ -44,6 +44,9 @@
                 <version>1.6.0</version>
                 <configuration>
                     <mainClass>net.ryswick.bender.Main</mainClass>
+                    <arguments>
+                        <argument>test.ben</argument>
+                    </arguments>
                 </configuration>
             </plugin>
             <plugin>
