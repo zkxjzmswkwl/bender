@@ -1,10 +1,11 @@
 fun test(name) {
   print name;
+  return "dongs";
 }
 
-fun exitProgram() {
-  moveMouse(2535, 19);
-  leftClick();
-}
+// fun exitProgram() {
+//   moveMouse(2535, 19);
+//   leftClick();
+// }
 
-exitProgram();
+print test("Carter");

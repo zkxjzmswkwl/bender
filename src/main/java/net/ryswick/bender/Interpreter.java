@@ -226,7 +226,8 @@ public class Interpreter implements Expression.Visitor<Object>,
         return null;
     }
 
-    @Override public Void visitCaptureStatement(Statement.Capture statement) {
+    @Override
+    public Void visitCaptureStatement(Statement.Capture statement) {
         Object value = evaluate(statement.expression);
         if (value instanceof String val) {
             Imaging.imageScreen(new Position(0, 0, 2540, 1440), val);
@@ -236,6 +237,15 @@ public class Interpreter implements Expression.Visitor<Object>,
         }
         return null;
     }
+
+    @Override
+    public Void visitReturnStatement(Statement.Return statement) {
+        Object value = null;
+        if (statement.value != null) value = evaluate(statement.value);
+
+        throw new Return(value);
+    }
+
 
     @Override
     public Void visitFuckitStatement(Statement.Fuckit statement) {

@@ -19,8 +19,8 @@ public class BenderFunction implements BenderCallable {
 
         try {
             interpreter.executeBlock(declaration.body, environment);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Return returnValue) {
+            return returnValue.value;
         }
 
         return null;

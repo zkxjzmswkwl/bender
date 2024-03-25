@@ -33,6 +33,7 @@ public class GenerateAst {
             "Print      : Expression expression",
             "Fuckit     : Expression expression",
             "Capture    : Expression expression",
+            "Return     : Token keyword, Expression value",
             "Var        : Token name, Expression initializer"
         ));
     }

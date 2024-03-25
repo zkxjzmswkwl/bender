@@ -11,6 +11,7 @@ abstract class Statement {
         R visitPrintStatement(Print statement);
         R visitFuckitStatement(Fuckit statement);
         R visitCaptureStatement(Capture statement);
+        R visitReturnStatement(Return statement);
         R visitVarStatement(Var statement);
     }
 
@@ -111,6 +112,21 @@ abstract class Statement {
         }
 
         final Expression expression;
+    }
+
+    static class Return extends Statement {
+        Return(Token keyword, Expression value) {
+            this.keyword = keyword;
+            this.value = value;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitReturnStatement(this);
+        }
+
+        final Token keyword;
+        final Expression value;
     }
 
     static class Var extends Statement {

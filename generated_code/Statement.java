@@ -6,9 +6,12 @@ abstract class Statement {
     interface Visitor<R> {
         R visitBlockStatement(Block statement);
         R visitExprStatement(Expr statement);
+        R visitFunctionStatement(Function statement);
         R visitIfStatement(If statement);
         R visitPrintStatement(Print statement);
         R visitFuckitStatement(Fuckit statement);
+        R visitCaptureStatement(Capture statement);
+        R visitReturnStatement(Return statement);
         R visitVarStatement(Var statement);
     }
 
@@ -36,6 +39,23 @@ abstract class Statement {
         }
 
         final Expression expression;
+    }
+
+    static class Function extends Statement {
+        Function(Token name, List<Token> params, List<Statement> body) {
+            this.name = name;
+            this.params = params;
+            this.body = body;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitFunctionStatement(this);
+        }
+
+        final Token name;
+        final List<Token> params;
+        final List<Statement> body;
     }
 
     static class If extends Statement {
@@ -79,6 +99,34 @@ abstract class Statement {
         }
 
         final Expression expression;
+    }
+
+    static class Capture extends Statement {
+        Capture(Expression expression) {
+            this.expression = expression;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitCaptureStatement(this);
+        }
+
+        final Expression expression;
+    }
+
+    static class Return extends Statement {
+        Return(Token keyword, Expression value) {
+            this.keyword = keyword;
+            this.value = value;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitReturnStatement(this);
+        }
+
+        final Token keyword;
+        final Expression value;
     }
 
     static class Var extends Statement {
