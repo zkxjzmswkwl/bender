@@ -12,6 +12,7 @@ abstract class Statement {
         R visitFuckitStatement(Fuckit statement);
         R visitCaptureStatement(Capture statement);
         R visitReturnStatement(Return statement);
+        R visitWhileStatement(While statement);
         R visitVarStatement(Var statement);
     }
 
@@ -127,6 +128,21 @@ abstract class Statement {
 
         final Token keyword;
         final Expression value;
+    }
+
+    static class While extends Statement {
+        While(Expression condition, Statement body) {
+            this.condition = condition;
+            this.body = body;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitWhileStatement(this);
+        }
+
+        final Expression condition;
+        final Statement body;
     }
 
     static class Var extends Statement {

@@ -1,6 +1,7 @@
 package net.ryswick.bender;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static net.ryswick.bender.EToken.*;
@@ -65,13 +66,65 @@ public class Parser {
     }
 
     private Statement statement() {
+        if (match(FOR)) return forStatement();
         if (match(IF)) return ifStatement();
         if (match(PRINT)) return printStatement();
+        if (match(WHILE)) return whileStatement();
         if (match(RETURN)) return returnStatement();
         if (match(CAPTURE)) return captureStatement();
         if (match(FUCKIT)) return fuckitStatement();
         if (match(LEFT_BRACE)) return new Statement.Block(block());
         return expressionStatement();
+    }
+
+    private Statement forStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+        Statement initializer;
+        if (match(SEMICOLON)) {
+            initializer = null;
+        } else if (match(VAR)) {
+            initializer = varDeclaration();
+        } else {
+            initializer = expressionStatement();
+        }
+
+        Expression condition = null;
+        if (!check(SEMICOLON)) {
+            condition = expression();
+        }
+        consume(SEMICOLON, "Expect ';' after condition.");
+
+        Expression increment = null;
+        if (!check(RIGHT_PAREN)) {
+            increment = expression();
+        }
+        consume(RIGHT_PAREN, "Expect ')' after loop clause.");
+
+        Statement body = statement();
+
+        if (increment != null) {
+            body = new Statement.Block(
+                Arrays.asList(
+                    body,
+                    new Statement.Expr(increment)
+                )
+            );
+        }
+
+        if (condition == null) condition = new Expression.Literal(true);
+        body = new Statement.While(condition, body);
+
+        if (initializer != null) {
+            body = new Statement.Block(
+                Arrays.asList(
+                    initializer,
+                    body
+                )
+            );
+        }
+
+        return body;
     }
 
     private Statement returnStatement() {
@@ -114,6 +167,14 @@ public class Parser {
         Expression value = expression();
         consume(SEMICOLON, "Expect ';' after value.");
         return new Statement.Print(value);
+    }
+
+    private Statement whileStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'while'.");
+        Expression condition = expression();
+        consume(RIGHT_PAREN, "Expect ')' after condition.");
+        Statement body = statement();
+        return new Statement.While(condition, body);
     }
 
     private Statement expressionStatement() {

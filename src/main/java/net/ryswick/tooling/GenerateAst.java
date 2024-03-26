@@ -34,6 +34,7 @@ public class GenerateAst {
             "Fuckit     : Expression expression",
             "Capture    : Expression expression",
             "Return     : Token keyword, Expression value",
+            "While      : Expression condition, Statement body",
             "Var        : Token name, Expression initializer"
         ));
     }

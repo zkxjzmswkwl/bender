@@ -239,6 +239,14 @@ public class Interpreter implements Expression.Visitor<Object>,
     }
 
     @Override
+    public Void visitWhileStatement(Statement.While statement) {
+        while (isTruthy(evaluate(statement.condition))) {
+            execute(statement.body);
+        }
+        return null;
+    }
+
+    @Override
     public Void visitReturnStatement(Statement.Return statement) {
         Object value = null;
         if (statement.value != null) value = evaluate(statement.value);
