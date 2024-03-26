@@ -1,11 +1,8 @@
-fun test(name) {
-  print name;
-  return "dongs";
+fun fib(n) {
+  if (n <= 1) return n;
+  return fib(n - 2) + fib(n - 1);
 }
 
-// fun exitProgram() {
-//   moveMouse(2535, 19);
-//   leftClick();
-// }
-
-print test("Carter");
+for (val i = 0; i < 20; i = i + 1) {
+  print fib(i);
+}
