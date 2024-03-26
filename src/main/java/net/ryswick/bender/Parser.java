@@ -25,6 +25,7 @@ public class Parser {
 
     private Statement declaration() {
         try {
+            if (match(CLASS)) return classDeclaration();
             if (match(FUN)) return function("function");
             if (match(VAR)) return varDeclaration();
             return statement();
@@ -32,6 +33,19 @@ public class Parser {
             syncrhonize();
             return null;
         }
+    }
+
+    private Statement classDeclaration() {
+        Token name = consume(IDENTIFIER, "Expect class name.");
+        List<Statement.Function> methods = new ArrayList<>();
+
+        consume(LEFT_BRACE, "Expect '{' before class body.");
+        while (!check(RIGHT_BRACE) && !eofReached()) {
+            methods.add(function("method"));
+        }
+        consume(RIGHT_BRACE, "Expect '}' after class body.");
+
+        return new Statement.Class(name, methods);
     }
 
     private Statement.Function function(String kind) {
