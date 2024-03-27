@@ -12,8 +12,7 @@ import net.ryswick.bender.imaging.Imaging;
 import net.ryswick.bender.imaging.Position;
 
 public class Interpreter implements Expression.Visitor<Object>,
-                                    Statement.Visitor<Void> {
-
+        Statement.Visitor<Void> {
 
     public Environment globals = new Environment();
     private Environment environment = globals;
@@ -21,6 +20,29 @@ public class Interpreter implements Expression.Visitor<Object>,
     static Robot robot = null;
 
     Interpreter() {
+        globals.define("imageRect", new BenderCallable() {
+            @Override
+            public int arity() {
+                return 4;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                if (arguments.get(0) instanceof Double x && arguments.get(1) instanceof Double y
+                        && arguments.get(2) instanceof Double w && arguments.get(3) instanceof Double h) {
+                    Imaging.imageScreen(new Position(x.intValue(), y.intValue(), w.intValue(), h.intValue()), null);
+                } else {
+                    Main.error(0, "imageRect requires four numbers.");
+                }
+                return null;
+            }
+
+            @Override
+            public String toString() {
+                return "<native fn>";
+            }
+        });
+
         globals.define("clock", new BenderCallable() {
             @Override
             public int arity() {
@@ -29,7 +51,7 @@ public class Interpreter implements Expression.Visitor<Object>,
 
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
-                return (double)System.currentTimeMillis() / 1000.0;
+                return (double) System.currentTimeMillis() / 1000.0;
             }
 
             @Override
@@ -164,7 +186,7 @@ public class Interpreter implements Expression.Visitor<Object>,
 
         if (object instanceof List) {
             List<Object> list = (List<Object>) object;
-            return list.get(((Double)index).intValue());
+            return list.get(((Double) index).intValue());
         }
         Main.error(69, "Shit's fucked. TODO: Fix this error message.");
         return null;
@@ -178,41 +200,43 @@ public class Interpreter implements Expression.Visitor<Object>,
         switch (expression.operator.type) {
             case GREATER:
                 checkNumberOperands(expression.operator, left, right);
-                return (double)left > (double)right;
+                return (double) left > (double) right;
             case GREATER_EQUAL:
                 checkNumberOperands(expression.operator, left, right);
-                return (double)left >= (double)right;
+                return (double) left >= (double) right;
             case LESS:
                 checkNumberOperands(expression.operator, left, right);
-                return (double)left < (double)right;
+                return (double) left < (double) right;
             case LESS_EQUAL:
                 checkNumberOperands(expression.operator, left, right);
-                return (double)left <= (double)right;
+                return (double) left <= (double) right;
             case MINUS:
                 checkNumberOperands(expression.operator, left, right);
-                return (double)left - (double)right;
+                return (double) left - (double) right;
             case PLUS:
                 if (left instanceof Double && right instanceof Double) {
-                    return (double)left + (double)right;
+                    return (double) left + (double) right;
                 }
 
                 if (left instanceof String && right instanceof String) {
-                    return (String)left + (String)right;
+                    return (String) left + (String) right;
                 }
 
                 if (left instanceof String && right instanceof Double) {
-                    return (String)left + stringify(right);
+                    return (String) left + stringify(right);
                 }
 
                 throw new RuntimeError(expression.operator, "Operands must be two numbers or two strings.");
             case SLASH:
                 checkNumberOperands(expression.operator, left, right);
-                return (double)left / (double)right;
+                return (double) left / (double) right;
             case STAR:
                 checkNumberOperands(expression.operator, left, right);
-                return (double)left * (double)right;
-            case BANG_EQUAL: return !isEqual(left, right);
-            case EQUAL_EQUAL: return isEqual(left, right);
+                return (double) left * (double) right;
+            case BANG_EQUAL:
+                return !isEqual(left, right);
+            case EQUAL_EQUAL:
+                return isEqual(left, right);
         }
 
         // Will not execute.
@@ -237,7 +261,7 @@ public class Interpreter implements Expression.Visitor<Object>,
             case BANG:
                 return !isTruthy(right);
             case MINUS:
-                return -(double)right;
+                return -(double) right;
         }
 
         // Will not execute.
@@ -286,11 +310,11 @@ public class Interpreter implements Expression.Visitor<Object>,
     @Override
     public Void visitReturnStatement(Statement.Return statement) {
         Object value = null;
-        if (statement.value != null) value = evaluate(statement.value);
+        if (statement.value != null)
+            value = evaluate(statement.value);
 
         throw new Return(value);
     }
-
 
     @Override
     public Void visitFuckitStatement(Statement.Fuckit statement) {
@@ -334,13 +358,15 @@ public class Interpreter implements Expression.Visitor<Object>,
     @Override
     public Object visitLogicalExpression(Expression.Logical expression) {
         Object left = evaluate(expression.left);
-        
+
         if (expression.operator.type == EToken.OR) {
-            if (isTruthy(left)) return left;
+            if (isTruthy(left))
+                return left;
         } else {
-            if (!isTruthy(left)) return left;
+            if (!isTruthy(left))
+                return left;
         }
-    
+
         return evaluate(expression.right);
     }
 
@@ -355,14 +381,14 @@ public class Interpreter implements Expression.Visitor<Object>,
 
         if (!(callee instanceof BenderCallable)) {
             throw new RuntimeError(
-                expression.paren, "Can only call functions and classes.");
+                    expression.paren, "Can only call functions and classes.");
         }
 
-        BenderCallable function = (BenderCallable)callee;
+        BenderCallable function = (BenderCallable) callee;
 
         if (arguments.size() != function.arity()) {
             throw new RuntimeError(expression.paren, "Expected " +
-                function.arity() + " arguments but got " + arguments.size() + ".");
+                    function.arity() + " arguments but got " + arguments.size() + ".");
         }
         return function.call(this, arguments);
     }
@@ -392,35 +418,41 @@ public class Interpreter implements Expression.Visitor<Object>,
         }
     }
 
-
     private Object evaluate(Expression expression) {
         return expression.accept(this);
     }
 
     private boolean isTruthy(Object object) {
-        if (object == null) return false;
-        if (object instanceof Boolean) return (boolean)object;
+        if (object == null)
+            return false;
+        if (object instanceof Boolean)
+            return (boolean) object;
         return true;
     }
 
     private boolean isEqual(Object a, Object b) {
-        if (a == null && b == null) return true;
-        if (a == null) return false;
+        if (a == null && b == null)
+            return true;
+        if (a == null)
+            return false;
         return a.equals(b);
     }
 
     private void checkNumberOperand(Token operator, Object operand) {
-        if (operand instanceof Double) return;
+        if (operand instanceof Double)
+            return;
         throw new RuntimeError(operator, "Operand must be a number.");
     }
 
     private void checkNumberOperands(Token operator, Object left, Object right) {
-        if (left instanceof Double && right instanceof Double) return;
+        if (left instanceof Double && right instanceof Double)
+            return;
         throw new RuntimeError(operator, "Operands must be numbers.");
     }
 
     private String stringify(Object object) {
-        if (object == null) return "nada";
+        if (object == null)
+            return "nada";
         if (object instanceof Double) {
             String text = object.toString();
             if (text.endsWith(".0")) {
@@ -452,10 +484,9 @@ public class Interpreter implements Expression.Visitor<Object>,
         Map<String, BenderFunction> methods = new HashMap<>();
         for (Statement.Function method : statement.methods) {
             BenderFunction function = new BenderFunction(
-                method,
-                environment,
-                method.name.lexeme.equals("ctor")
-            );
+                    method,
+                    environment,
+                    method.name.lexeme.equals("ctor"));
             methods.put(method.name.lexeme, function);
         }
         BenderClass c = new BenderClass(statement.name.lexeme, methods);
@@ -467,7 +498,7 @@ public class Interpreter implements Expression.Visitor<Object>,
     public Object visitGetExpression(Expression.Get expression) {
         Object object = evaluate(expression.object);
         if (object instanceof BenderInstance) {
-            return ((BenderInstance)object).get(expression.name);
+            return ((BenderInstance) object).get(expression.name);
         }
 
         throw new RuntimeError(expression.name, "Only instances have properties.");
@@ -482,7 +513,7 @@ public class Interpreter implements Expression.Visitor<Object>,
         }
 
         Object value = evaluate(expression.value);
-        ((BenderInstance)object).set(expression.name, value);
+        ((BenderInstance) object).set(expression.name, value);
         return value;
     }
 
@@ -497,7 +528,7 @@ public class Interpreter implements Expression.Visitor<Object>,
         }
 
         List<Object> list = (List<Object>) object;
-        list.set(((Double)index).intValue(), value);
+        list.set(((Double) index).intValue(), value);
 
         return value;
     }

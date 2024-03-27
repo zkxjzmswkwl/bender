@@ -30,7 +30,7 @@ public class Parser {
             if (match(VAR)) return varDeclaration();
             return statement();
         } catch (ParseError error) {
-            syncrhonize();
+            synchronize();
             return null;
         }
     }
@@ -85,7 +85,7 @@ public class Parser {
         if (match(PRINT)) return printStatement();
         if (match(WHILE)) return whileStatement();
         if (match(RETURN)) return returnStatement();
-        if (match(CAPTURE)) return captureStatement();
+        // if (match(CAPTURE)) return captureStatement();
         if (match(FUCKIT)) return fuckitStatement();
         if (match(LEFT_BRACE)) return new Statement.Block(block());
         return expressionStatement();
@@ -490,7 +490,7 @@ public class Parser {
         return new ParseError();
     }
 
-    private void syncrhonize() {
+    private void synchronize() {
         advance();
 
         while (!eofReached()) {
