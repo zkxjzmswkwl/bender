@@ -1,23 +1,6 @@
-class Player {
-    ctor(name) {
-        this.name = name;
-        this.hp = 100;
-    }
+val l = [1, 2, 3];
+print l[2];
+l[2] = 69;
+print l[2];
 
-    str() {
-        return "Player: " + this.name + " HP: " + this.hp;
-    }
 
-    takeDamage(amount) {
-        this.hp = this.hp - amount;
-    }
-
-    heal(amount) {
-        this.hp = this.hp + amount;
-    }
-}
-
-val p = Player("Carter");
-print p.str();
-p.takeDamage(50);
-print p.str();
