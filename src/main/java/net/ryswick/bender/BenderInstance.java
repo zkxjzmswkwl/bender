@@ -21,6 +21,9 @@ public class BenderInstance {
             return fields.get(name.lexeme);
         }
 
+        BenderFunction method = c.findMethod(name.lexeme);
+        if (method != null) return method.bind(this);
+
         throw new RuntimeError(name,
                 "Undefined property '" + name.lexeme + "'.");
     }

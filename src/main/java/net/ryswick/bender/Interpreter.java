@@ -344,9 +344,14 @@ public class Interpreter implements Expression.Visitor<Object>,
 
     @Override
     public Void visitFunctionStatement(Statement.Function statement) {
-        BenderFunction function = new BenderFunction(statement);
+        BenderFunction function = new BenderFunction(statement, environment);
         environment.define(statement.name.lexeme, function);
         return null;
+    }
+
+    @Override
+    public Object visitThisExpression(Expression.This expression) {
+        return lookUpVariable(expression.keyword, expression);
     }
 
     void executeBlock(List<Statement> statements, Environment environment) {
@@ -418,7 +423,17 @@ public class Interpreter implements Expression.Visitor<Object>,
     @Override
     public Void visitClassStatement(Statement.Class statement) {
         environment.define(statement.name.lexeme, null);
-        BenderClass c = new BenderClass(statement.name.lexeme);
+
+        Map<String, BenderFunction> methods = new HashMap<>();
+        for (Statement.Function method : statement.methods) {
+            BenderFunction function = new BenderFunction(
+                method,
+                environment,
+                method.name.lexeme.equals("ctor")
+            );
+            methods.put(method.name.lexeme, function);
+        }
+        BenderClass c = new BenderClass(statement.name.lexeme, methods);
         environment.assign(statement.name, c);
         return null;
     }

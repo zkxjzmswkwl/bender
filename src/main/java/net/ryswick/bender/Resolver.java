@@ -13,12 +13,14 @@ public class Resolver implements Expression.Visitor<Void>, Statement.Visitor<Voi
     private final Interpreter interpreter;
     private final Stack<Map<String, Boolean>> scopes = new Stack<>();
     private FunctionType currentFunction = FunctionType.NONE;
+    private ClassType currentClass = ClassType.NONE;
 
     Resolver(Interpreter interpreter) {
         this.interpreter = interpreter;
     }
 
-    private enum FunctionType { NONE, FUNCTION }
+    private enum FunctionType { NONE, FUNCTION, METHOD, INITIALIZER }
+    private enum ClassType { NONE, CLASS }
 
     @Override
     public Void visitBlockStatement(Statement.Block statement) {
@@ -90,6 +92,9 @@ public class Resolver implements Expression.Visitor<Void>, Statement.Visitor<Voi
         }
 
         if (statement.value != null) {
+            if (currentFunction == FunctionType.INITIALIZER) {
+                Main.error(statement.keyword, "Can't return from ctor. The fuck you doin?");
+            }
             resolve(statement.value);
         }
         return null;
@@ -152,6 +157,16 @@ public class Resolver implements Expression.Visitor<Void>, Statement.Visitor<Voi
     @Override
     public Void visitUnaryExpression(Expression.Unary expression) {
         resolve(expression.right);
+        return null;
+    }
+
+    @Override
+    public Void visitThisExpression(Expression.This expression) {
+        if (currentClass == ClassType.NONE) {
+            Main.error(expression.keyword, "Cannot use 'this' outside of a class.");
+            return null;
+        }
+        resolveLocal(expression, expression.keyword);
         return null;
     }
 
@@ -218,8 +233,26 @@ public class Resolver implements Expression.Visitor<Void>, Statement.Visitor<Voi
 
     @Override
     public Void visitClassStatement(Class statement) {
+        ClassType enclosingClass = currentClass;
+        currentClass = ClassType.CLASS;
+
         declare(statement.name);
         define(statement.name);
+        
+        beginScope();
+        scopes.peek().put("this", true);
+
+        for (Statement.Function method : statement.methods) {
+            FunctionType declaration = FunctionType.METHOD;
+            if (method.name.lexeme.equals("ctor")) {
+                declaration = FunctionType.INITIALIZER;
+            }
+            resolveFunction(method, declaration);
+        }
+
+        endScope();
+        currentClass = enclosingClass;
+
         return null;
     }
 

@@ -9,6 +9,7 @@ abstract class Expression {
         R visitCallExpression(Call expression);
         R visitGetExpression(Get expression);
         R visitSetExpression(Set expression);
+        R visitThisExpression(This expression);
         R visitGroupingExpression(Grouping expression);
         R visitLiteralExpression(Literal expression);
         R visitLogicalExpression(Logical expression);
@@ -95,6 +96,19 @@ abstract class Expression {
         final Expression object;
         final Token name;
         final Expression value;
+    }
+
+    static class This extends Expression {
+        This(Token keyword) {
+            this.keyword = keyword;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitThisExpression(this);
+        }
+
+        final Token keyword;
     }
 
     static class Grouping extends Expression {
