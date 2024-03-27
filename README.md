@@ -4,9 +4,11 @@
 
 </center>
 
-
 ## Roadmap
 - Java implementation
 - D implementation
 - Hopefully not bored by now
 - ??
+
+### Script example w/ syntax highlighting (kinda-ish).
+![Basic state detection/advancement.](https://p.ryswick.net/p/IbxLxT.js)
