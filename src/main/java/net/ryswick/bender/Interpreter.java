@@ -8,7 +8,6 @@ import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Robot;
 
-import net.ryswick.bender.Statement.Class;
 import net.ryswick.bender.imaging.Imaging;
 import net.ryswick.bender.imaging.Position;
 
@@ -178,6 +177,11 @@ public class Interpreter implements Expression.Visitor<Object>,
                 if (left instanceof String && right instanceof String) {
                     return (String)left + (String)right;
                 }
+
+                if (left instanceof String && right instanceof Double) {
+                    return (String)left + stringify(right);
+                }
+
                 throw new RuntimeError(expression.operator, "Operands must be two numbers or two strings.");
             case SLASH:
                 checkNumberOperands(expression.operator, left, right);
@@ -292,7 +296,6 @@ public class Interpreter implements Expression.Visitor<Object>,
     @Override
     public Object visitVariableExpression(Expression.Variable expression) {
         return lookUpVariable(expression.name, expression);
-        // return environment.get(expression.name);
     }
 
     @Override
@@ -344,7 +347,7 @@ public class Interpreter implements Expression.Visitor<Object>,
 
     @Override
     public Void visitFunctionStatement(Statement.Function statement) {
-        BenderFunction function = new BenderFunction(statement, environment);
+        BenderFunction function = new BenderFunction(statement, environment, false);
         environment.define(statement.name.lexeme, function);
         return null;
     }
