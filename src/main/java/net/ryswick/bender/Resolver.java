@@ -283,4 +283,11 @@ public class Resolver implements Expression.Visitor<Void>, Statement.Visitor<Voi
         resolve(expression.index);
         return null;
     }
+
+    @Override
+    public Void visitIndexAssignExpression(Expression.IndexAssign expression) {
+        resolve(expression.index);
+        resolve(expression.value);
+        return null;
+    }
 }

@@ -17,6 +17,7 @@ abstract class Expression {
         R visitVariableExpression(Variable expression);
         R visitListLiteralExpression(ListLiteral expression);
         R visitIndexExpression(Index expression);
+        R visitIndexAssignExpression(IndexAssign expression);
     }
 
     static class Assign extends Expression {
@@ -209,6 +210,21 @@ abstract class Expression {
         @Override
         <R> R accept(Visitor<R> visitor) {
             return visitor.visitIndexExpression(this);
+        }
+    }
+
+    public static class IndexAssign extends Expression {
+        final Index index;
+        final Expression value;
+
+        IndexAssign(Index index, Expression value) {
+            this.index = index;
+            this.value = value;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitIndexAssignExpression(this);
         }
     }
 

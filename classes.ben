@@ -1,0 +1,23 @@
+class Player {
+    ctor(name) {
+        this.name = name;
+        this.hp = 100;
+    }
+
+    str() {
+        return "Player: " + this.name + " HP: " + this.hp;
+    }
+
+    takeDamage(amount) {
+        this.hp = this.hp - amount;
+    }
+
+    heal(amount) {
+        this.hp = this.hp + amount;
+    }
+}
+
+val p = Player("Carter");
+print p.str();
+p.takeDamage(50);
+print p.str();

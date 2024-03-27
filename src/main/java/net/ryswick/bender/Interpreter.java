@@ -485,4 +485,20 @@ public class Interpreter implements Expression.Visitor<Object>,
         ((BenderInstance)object).set(expression.name, value);
         return value;
     }
+
+    @Override
+    public Object visitIndexAssignExpression(Expression.IndexAssign expression) {
+        Object object = evaluate(expression.index.name);
+        Object index = evaluate(expression.index.index);
+        Object value = evaluate(expression.value);
+
+        if (!(object instanceof List)) {
+            Main.error(69, "GIGAFUCKED.");
+        }
+
+        List<Object> list = (List<Object>) object;
+        list.set(((Double)index).intValue(), value);
+
+        return value;
+    }
 }

@@ -223,6 +223,9 @@ public class Parser {
             } else if (expression instanceof Expression.Get) {
                 Expression.Get get = (Expression.Get)expression;
                 return new Expression.Set(get.object, get.name, value);
+            } else if (expression instanceof Expression.Index) {
+                Expression.Index index = (Expression.Index)expression;
+                return new Expression.IndexAssign(index, value);
             }
             error(equals, "Invalid assignment target.");
         }
@@ -507,22 +510,6 @@ public class Parser {
 
             advance();
         }
-    }
-
-    private Expression indexing() {
-        Expression object = primary();
-
-        while (true) {
-            if (match(LEFT_BRACKET)) {
-                Expression index = expression();
-                consume(RIGHT_BRACKET, "Expect ']' after index.");
-                object = new Expression.Index(object, index);
-            } else {
-                break;
-            }
-        }
-
-        return object;
     }
 
     private Expression variableOrIndexing() {
