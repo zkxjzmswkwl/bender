@@ -22,6 +22,23 @@ public class Interpreter implements Expression.Visitor<Object>,
     static Robot robot = null;
 
     Interpreter() {
+        globals.define("processImage", new BenderCallable() {
+            @Override
+            public int arity() {
+                return 5;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                BufferedImage image = (BufferedImage) arguments.get(0);
+                return Imaging.processTest(image,
+                        ((Double) arguments.get(1)).intValue(),
+                        ((Double) arguments.get(2)).intValue(),
+                        ((Double) arguments.get(3)).intValue(),
+                        ((Double) arguments.get(4)).intValue());
+            }
+        });
+
         globals.define("holup", new BenderCallable() {
             @Override
             public int arity() {
@@ -30,7 +47,7 @@ public class Interpreter implements Expression.Visitor<Object>,
 
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
-                int amount = ((Double)arguments.get(0)).intValue();
+                int amount = ((Double) arguments.get(0)).intValue();
                 System.out.println("Sleeping for " + amount * 1000);
                 try {
                     Thread.sleep(amount * 1000);
@@ -50,7 +67,7 @@ public class Interpreter implements Expression.Visitor<Object>,
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
                 Object imageInput = arguments.get(0);
-                return Tess.getInstance().readImage((BufferedImage)imageInput);
+                return Tess.getInstance().readImage((BufferedImage) imageInput);
             }
 
             @Override
@@ -67,21 +84,17 @@ public class Interpreter implements Expression.Visitor<Object>,
 
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
-                if (
-                    arguments.get(0) instanceof Double x &&
-                    arguments.get(1) instanceof Double y &&
-                    arguments.get(2) instanceof Double w &&
-                    arguments.get(3) instanceof Double h
-                ) {
+                if (arguments.get(0) instanceof Double x &&
+                        arguments.get(1) instanceof Double y &&
+                        arguments.get(2) instanceof Double w &&
+                        arguments.get(3) instanceof Double h) {
                     return Imaging.imageScreen(
                             new Position(
-                                x.intValue(),
-                                y.intValue(),
-                                w.intValue(),
-                                h.intValue()
-                            ),
-                        null
-                    );
+                                    x.intValue(),
+                                    y.intValue(),
+                                    w.intValue(),
+                                    h.intValue()),
+                            null);
                 } else {
                     Main.error(0, "imageRect requires four numbers.");
                 }

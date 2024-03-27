@@ -14,6 +14,7 @@ public class Tess {
         tesseract = new Tesseract();
         tesseract.setDatapath("C:\\Program Files\\Tesseract-OCR\\tessdata");
         tesseract.setTessVariable("user_defined_dpi", "70");
+        tesseract.setVariable("tessedit_char_whitelist", "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ");
     }
 
     public static Tess getInstance() {
@@ -41,7 +42,7 @@ public class Tess {
 
     public String readImage(BufferedImage input) {
         try {
-            return tesseract.doOCR(input);
+            return tesseract.doOCR(input).strip().toLowerCase();
         } catch (TesseractException e) {
             e.printStackTrace();
             return null;
