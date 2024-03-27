@@ -1,11 +1,14 @@
 package net.ryswick.bender;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Robot;
 
+import net.ryswick.bender.Statement.Class;
 import net.ryswick.bender.imaging.Imaging;
 import net.ryswick.bender.imaging.Position;
 
@@ -15,6 +18,7 @@ public class Interpreter implements Expression.Visitor<Object>,
 
     public Environment globals = new Environment();
     private Environment environment = globals;
+    private final Map<Expression, Integer> locals = new HashMap<>();
     static Robot robot = null;
 
     Interpreter() {
@@ -134,7 +138,14 @@ public class Interpreter implements Expression.Visitor<Object>,
     @Override
     public Object visitAssignExpression(Expression.Assign expression) {
         Object value = evaluate(expression.value);
-        environment.assign(expression.name, value);
+
+        Integer distance = locals.get(expression);
+        if (distance != null) {
+            environment.assignAt(distance, expression.name, value);
+        } else {
+            globals.assign(expression.name, value);
+        }
+        // environment.assign(expression.name, value);
         return value;
     }
 
@@ -280,7 +291,8 @@ public class Interpreter implements Expression.Visitor<Object>,
 
     @Override
     public Object visitVariableExpression(Expression.Variable expression) {
-        return environment.get(expression.name);
+        return lookUpVariable(expression.name, expression);
+        // return environment.get(expression.name);
     }
 
     @Override
@@ -388,5 +400,24 @@ public class Interpreter implements Expression.Visitor<Object>,
         }
 
         return object.toString();
+    }
+
+    public void resolve(Expression expression, int depth) {
+        locals.put(expression, depth);
+    }
+
+    private Object lookUpVariable(Token name, Expression expression) {
+        Integer distance = locals.get(expression);
+        if (distance != null) {
+            return environment.getAt(distance, name.lexeme);
+        } else {
+            return globals.get(name);
+        }
+    }
+
+    @Override
+    public Void visitClassStatement(Class statement) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'visitClassStatement'");
     }
 }
