@@ -11,4 +11,4 @@
 - ??
 
 ### Script example w/ syntax highlighting (kinda-ish).
-![Basic state detection/advancement.](https://p.ryswick.net/p/IbxLxT.cpp)
+[Basic state detection/advancement.](https://p.ryswick.net/p/IbxLxT.cpp)
