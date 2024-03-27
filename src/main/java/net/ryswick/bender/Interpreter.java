@@ -416,8 +416,33 @@ public class Interpreter implements Expression.Visitor<Object>,
     }
 
     @Override
-    public Void visitClassStatement(Class statement) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'visitClassStatement'");
+    public Void visitClassStatement(Statement.Class statement) {
+        environment.define(statement.name.lexeme, null);
+        BenderClass c = new BenderClass(statement.name.lexeme);
+        environment.assign(statement.name, c);
+        return null;
+    }
+
+    @Override
+    public Object visitGetExpression(Expression.Get expression) {
+        Object object = evaluate(expression.object);
+        if (object instanceof BenderInstance) {
+            return ((BenderInstance)object).get(expression.name);
+        }
+
+        throw new RuntimeError(expression.name, "Only instances have properties.");
+    }
+
+    @Override
+    public Object visitSetExpression(Expression.Set expression) {
+        Object object = evaluate(expression.object);
+
+        if (!(object instanceof BenderInstance)) {
+            throw new RuntimeError(expression.name, "Only instances have fields.");
+        }
+
+        Object value = evaluate(expression.value);
+        ((BenderInstance)object).set(expression.name, value);
+        return value;
     }
 }

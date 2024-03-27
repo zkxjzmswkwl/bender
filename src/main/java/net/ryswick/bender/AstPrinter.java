@@ -1,5 +1,8 @@
 package net.ryswick.bender;
 
+import net.ryswick.bender.Expression.Get;
+import net.ryswick.bender.Expression.Set;
+
 public class AstPrinter implements Expression.Visitor<String> {
 
     String print(Expression expression) {
@@ -57,5 +60,17 @@ public class AstPrinter implements Expression.Visitor<String> {
         }
         builder.append(")");
         return builder.toString();
+    }
+
+    @Override
+    public String visitGetExpression(Get expression) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'visitGetExpression'");
+    }
+
+    @Override
+    public String visitSetExpression(Set expression) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'visitSetExpression'");
     }
 }

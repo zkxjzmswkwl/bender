@@ -18,6 +18,8 @@ public class GenerateAst {
             "Assign   : Token name, Expression value",
             "Binary   : Expression left, Token operator, Expression right",
             "Call     : Expression callee, Token paren, List<Expression> arguments",
+            "Get      : Expression object, Token name",
+            "Set      : Expression object, Token name, Expression value",
             "Grouping : Expression expression",
             "Literal  : Object value",
             "Logical  : Expression left, Token operator, Expression right",
