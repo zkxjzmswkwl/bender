@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import net.ryswick.bender.Expression.ListLiteral;
 import net.ryswick.bender.Statement.Capture;
 import net.ryswick.bender.Statement.Class;
 import net.ryswick.bender.Statement.Fuckit;
@@ -266,5 +267,20 @@ public class Resolver implements Expression.Visitor<Void>, Statement.Visitor<Voi
     public Void visitCaptureStatement(Capture statement) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'visitCaptureStatement'");
+    }
+
+    @Override
+    public Void visitListLiteralExpression(Expression.ListLiteral expression) {
+        for (Expression element: expression.elements) {
+            resolve(element);
+        }
+        return null;
+    }
+
+    @Override
+    public Void visitIndexExpression(Expression.Index expression) {
+        resolve(expression.name);
+        resolve(expression.index);
+        return null;
     }
 }

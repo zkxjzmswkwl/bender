@@ -149,6 +149,28 @@ public class Interpreter implements Expression.Visitor<Object>,
     }
 
     @Override
+    public Object visitListLiteralExpression(Expression.ListLiteral expression) {
+        List<Object> list = new ArrayList<>();
+        for (Expression element : expression.elements) {
+            list.add(evaluate(element));
+        }
+        return list;
+    }
+
+    @Override
+    public Object visitIndexExpression(Expression.Index expression) {
+        Object object = evaluate(expression.name);
+        Object index = evaluate(expression.index);
+
+        if (object instanceof List) {
+            List<Object> list = (List<Object>) object;
+            return list.get(((Double)index).intValue());
+        }
+        Main.error(69, "Shit's fucked. TODO: Fix this error message.");
+        return null;
+    }
+
+    @Override
     public Object visitBinaryExpression(Expression.Binary expression) {
         Object left = evaluate(expression.left);
         Object right = evaluate(expression.right);

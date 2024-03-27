@@ -15,6 +15,8 @@ abstract class Expression {
         R visitLogicalExpression(Logical expression);
         R visitUnaryExpression(Unary expression);
         R visitVariableExpression(Variable expression);
+        R visitListLiteralExpression(ListLiteral expression);
+        R visitIndexExpression(Index expression);
     }
 
     static class Assign extends Expression {
@@ -182,6 +184,33 @@ abstract class Expression {
         final Token name;
     }
 
+    static class ListLiteral extends Expression {
+        final List<Expression> elements;
+
+        ListLiteral(List<Expression> elements) {
+            this.elements = elements;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitListLiteralExpression(this);
+        }
+    }
+
+    public static class Index extends Expression {
+        final Expression name;
+        final Expression index;
+
+        Index(Expression name, Expression index) {
+            this.name = name;
+            this.index = index;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitIndexExpression(this);
+        }
+    }
 
     abstract <R> R accept(Visitor<R> visitor);
 }

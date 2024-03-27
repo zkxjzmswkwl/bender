@@ -286,18 +286,38 @@ public class Parser {
         return previous();
     }
 
+    /**
+     * Checks if the end of the file has been reached.
+     *
+     * @return true if the current token is the EOF token, false otherwise.
+     */
     private boolean eofReached() {
         return peek().type == EOF;
     }
 
+    /**
+     * Returns the current token without consuming it.
+     *
+     * @return the current token.
+     */
     private Token peek() {
         return tokens.get(current);
     }
 
+    /**
+     * Returns the most recently consumed token.
+     *
+     * @return the most recently consumed token.
+     */
     private Token previous() {
         return tokens.get(current - 1);
     }
 
+    /**
+     * Parses a comparison expression.
+     *
+     * @return a new Binary expression representing the comparison.
+     */
     private Expression comparison() {
         Expression expression = term();
 
@@ -310,6 +330,11 @@ public class Parser {
         return expression;
     }
 
+    /**
+     * Parses a term expression.
+     *
+     * @return a new Binary expression representing the term.
+     */
     private Expression term() {
         Expression expression = factor();
 
@@ -322,6 +347,11 @@ public class Parser {
         return expression;
     }
 
+    /**
+     * Parses a factor expression.
+     *
+     * @return a new Binary expression representing the factor.
+     */
     private Expression factor() {
         Expression expression = unary();
 
@@ -334,6 +364,11 @@ public class Parser {
         return expression;
     }
 
+    /**
+     * Parses a unary expression.
+     *
+     * @return a new Unary expression if the current token is a BANG or MINUS token, otherwise calls the call() method.
+     */
     private Expression unary() {
         if (match(BANG, MINUS)) {
             Token operator = previous();
@@ -376,6 +411,26 @@ public class Parser {
     }
 
 
+    /**
+     * <p>
+     * Parses a primary expression.
+     * </p>
+     *
+     * <p>
+     * Primary expressions in our grammar are the most basic elements,
+     * including literals (like numbers, strings, and boolean values),
+     * identifiers (variable names), list literals, and parenthesized expressions.
+     * </p>
+     *
+     * <p>  This method checks the current token to determine what kind of expression to parse.</p>
+     * <p>If the current token matches a literal token type, it creates a new Literal expression.</p>
+     * <p>If the current token is a LEFT_BRACKET, it calls the listLiteral() method to parse a list literal.</p>
+     * <p>If the current token is an IDENTIFIER, it calls the variableOrIndexing() method to parse a variable reference or indexing expression.</p>
+     * <p>If the current token is a LEFT_PAREN, it parses a parenthesized expression.</p>
+     *
+     * @return a new Expression representing the parsed primary expression.
+     * @throws ParseError if the current token does not match any known primary expression type.
+     */
     private Expression primary() {
         if (match(FALSE))   return new Expression.Literal(false);
         if (match(TRUE))   return new Expression.Literal(true);
@@ -385,12 +440,16 @@ public class Parser {
             return new Expression.Literal(previous().literal);
         }
 
+        if (match(LEFT_BRACKET)) {
+            return listLiteral();
+        }
+
         if (match(THIS)) {
             return new Expression.This(previous());
         }
 
         if (match(IDENTIFIER)) {
-            return new Expression.Variable(previous());
+            return variableOrIndexing();
         }
 
         if (match(LEFT_PAREN)) {
@@ -400,6 +459,21 @@ public class Parser {
         }
 
         throw error(peek(), "Expect expression.");
+    }
+
+    private Expression listLiteral() {
+        List<Expression> elements = new ArrayList<>();
+        if (!check(RIGHT_BRACKET)) {
+            do {
+                if (elements.size() >= 255) {
+                    error(peek(), "Can't have more than 255 elements in a list literal.");
+                }
+                elements.add(expression());
+            } while (match(COMMA));
+        }
+
+        consume(RIGHT_BRACKET, "Expect ']' after list literal.");
+        return new Expression.ListLiteral(elements);
     }
 
     private Token consume(EToken type, String message) {
@@ -433,5 +507,37 @@ public class Parser {
 
             advance();
         }
+    }
+
+    private Expression indexing() {
+        Expression object = primary();
+
+        while (true) {
+            if (match(LEFT_BRACKET)) {
+                Expression index = expression();
+                consume(RIGHT_BRACKET, "Expect ']' after index.");
+                object = new Expression.Index(object, index);
+            } else {
+                break;
+            }
+        }
+
+        return object;
+    }
+
+    private Expression variableOrIndexing() {
+        Expression expression = new Expression.Variable(previous());
+
+        while (true) {
+            if (match(LEFT_BRACKET)) {
+                Expression index = expression();
+                consume(RIGHT_BRACKET, "Expect ']' after index.");
+                expression = new Expression.Index(expression, index);
+            } else {
+                break;
+            }
+        }
+
+        return expression;
     }
 }

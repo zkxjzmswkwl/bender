@@ -15,6 +15,7 @@ abstract class Expression {
         R visitLogicalExpression(Logical expression);
         R visitUnaryExpression(Unary expression);
         R visitVariableExpression(Variable expression);
+        R visitListLiteralExpr(ListLiteral expression);
     }
 
     static class Assign extends Expression {
@@ -180,6 +181,19 @@ abstract class Expression {
         }
 
         final Token name;
+    }
+
+    static class ListLiteral extends Expr {
+        final List<Expr> elements;
+
+        ListLiteral(List<Expr> elements) {
+            this.elements = elements;
+        }
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitListLiteralExpr(this);
+        }
     }
 
 
