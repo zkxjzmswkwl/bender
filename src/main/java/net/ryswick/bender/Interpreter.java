@@ -1,5 +1,7 @@
 package net.ryswick.bender;
 
+import net.ryswick.bender.imaging.Tess;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +22,43 @@ public class Interpreter implements Expression.Visitor<Object>,
     static Robot robot = null;
 
     Interpreter() {
+        globals.define("holup", new BenderCallable() {
+            @Override
+            public int arity() {
+                return 1;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                int amount = ((Double)arguments.get(0)).intValue();
+                System.out.println("Sleeping for " + amount * 1000);
+                try {
+                    Thread.sleep(amount * 1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+        });
+
+        globals.define("readImage", new BenderCallable() {
+            @Override
+            public int arity() {
+                return 1;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                Object imageInput = arguments.get(0);
+                return Tess.getInstance().readImage((BufferedImage)imageInput);
+            }
+
+            @Override
+            public String toString() {
+                return "<native fn readImage>";
+            }
+        });
+
         globals.define("imageRect", new BenderCallable() {
             @Override
             public int arity() {
@@ -28,9 +67,21 @@ public class Interpreter implements Expression.Visitor<Object>,
 
             @Override
             public Object call(Interpreter interpreter, List<Object> arguments) {
-                if (arguments.get(0) instanceof Double x && arguments.get(1) instanceof Double y
-                        && arguments.get(2) instanceof Double w && arguments.get(3) instanceof Double h) {
-                    Imaging.imageScreen(new Position(x.intValue(), y.intValue(), w.intValue(), h.intValue()), null);
+                if (
+                    arguments.get(0) instanceof Double x &&
+                    arguments.get(1) instanceof Double y &&
+                    arguments.get(2) instanceof Double w &&
+                    arguments.get(3) instanceof Double h
+                ) {
+                    return Imaging.imageScreen(
+                            new Position(
+                                x.intValue(),
+                                y.intValue(),
+                                w.intValue(),
+                                h.intValue()
+                            ),
+                        null
+                    );
                 } else {
                     Main.error(0, "imageRect requires four numbers.");
                 }

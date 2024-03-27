@@ -259,7 +259,7 @@ public class Resolver implements Expression.Visitor<Void>, Statement.Visitor<Voi
 
     @Override
     public Void visitFuckitStatement(Fuckit statement) {
-        // TODO Auto-generated method stub
+        // TODO: Implement fuckit resolve zzz.
         throw new UnsupportedOperationException("Unimplemented method 'visitFuckitStatement'");
     }
 

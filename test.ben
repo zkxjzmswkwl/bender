@@ -1,8 +1,40 @@
-val l = [1, 2, 3];
-print l[2];
-l[2] = 69;
-print l[2];
+// PLAY - 44, 279, 154, 69
+class StateCheck {
+    ctor(expectedStr, x, y, w, h) {
+        print "[" + clock() + "] +StateCheck (" + expectedStr + ")";
+        this.expectedStr = expectedStr;
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+    }
 
+    go() {
+        val image = imageRect(this.x, this.y, this.w, this.h);
+        val ocrOut = readImage(image);
+        print ocrOut;
+        return ocrOut == this.expectedStr;
+    }
+}
 
+class StateMachine {
+    ctor() {
+        print "[" + clock() + "] +StateMachine";
+        this.checkMainMenu = StateCheck("PLAY", 44, 279, 154, 69);
+    }
 
-imageRect(0, 0, 400, 400);
+    test() {
+        if (this.checkMainMenu.go()) {
+            print "nicecock";
+        } else {
+            print ":(";
+        }
+    }
+}
+
+// Sleep 2 seconds.
+holup(2);
+
+val stateMachine = StateMachine();
+stateMachine.test();
+
