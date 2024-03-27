@@ -5,7 +5,7 @@ class Player {
     }
 
     str() {
-        return "Player: " + this.name;
+        return "Player: " + this.name + " HP: " + this.hp;
     }
 
     takeDamage(amount) {
@@ -19,6 +19,5 @@ class Player {
 
 val p = Player("Carter");
 print p.str();
-print p.hp;
 p.takeDamage(50);
-print p.hp;
+print p.str();
