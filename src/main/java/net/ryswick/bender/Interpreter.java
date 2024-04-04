@@ -2,6 +2,10 @@ package net.ryswick.bender;
 
 import net.ryswick.bender.imaging.Tess;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +14,7 @@ import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Robot;
 
+import net.ryswick.bender.Statement.Yoink;
 import net.ryswick.bender.imaging.Imaging;
 import net.ryswick.bender.imaging.Position;
 
@@ -595,5 +600,27 @@ public class Interpreter implements Expression.Visitor<Object>,
         list.set(((Double) index).intValue(), value);
 
         return value;
+    }
+
+@Override
+    public Void visitYoinkStatement(Statement.Yoink statement) {
+        String path = statement.path.lexeme.replace("\"", "");
+
+        try {
+            byte[] encoded = Files.readAllBytes(Paths.get(path));
+            String fileContents = new String(encoded, StandardCharsets.UTF_8);
+
+            Scanner lexer = new Scanner(fileContents);
+            Parser parser = new Parser(lexer.scanTokens());
+            List<Statement> statements = parser.parse();
+
+            // Use the current interpreter and environment
+            executeBlock(statements, environment);
+
+        } catch (IOException e) {
+            throw new RuntimeError(statement.path, "Unable to read file '" + path + "'.");
+        }
+
+        return null;
     }
 }

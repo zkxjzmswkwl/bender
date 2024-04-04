@@ -9,6 +9,7 @@ import net.ryswick.bender.Expression.ListLiteral;
 import net.ryswick.bender.Statement.Capture;
 import net.ryswick.bender.Statement.Class;
 import net.ryswick.bender.Statement.Fuckit;
+import net.ryswick.bender.Statement.Yoink;
 
 public class Resolver implements Expression.Visitor<Void>, Statement.Visitor<Void> {
     private final Interpreter interpreter;
@@ -288,6 +289,11 @@ public class Resolver implements Expression.Visitor<Void>, Statement.Visitor<Voi
     public Void visitIndexAssignExpression(Expression.IndexAssign expression) {
         resolve(expression.index);
         resolve(expression.value);
+        return null;
+    }
+
+    @Override
+    public Void visitYoinkStatement(Yoink statement) {
         return null;
     }
 }

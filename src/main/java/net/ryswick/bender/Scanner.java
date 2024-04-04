@@ -37,6 +37,7 @@ public class Scanner {
         keywords.put("val", VAR);
         keywords.put("while", WHILE);
         keywords.put("fuckit", FUCKIT);
+        keywords.put("yoink", YOINK);
         // keywords.put("capture", CAPTURE);
     }
 

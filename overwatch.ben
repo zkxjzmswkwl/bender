@@ -1,0 +1,109 @@
+class Threshold {
+    ctor(r, g, b, range) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.range = range;
+    }
+}
+
+class Capture {
+    ctor(x, y, w, h) {
+        this.x = x;
+        this.y = y;
+        this.w = w;
+        this.h = h;
+    }
+}
+
+class State {
+    ctor(expectedStr, capture, threshold) {
+        print "[" + clock() + "] +State (" + expectedStr + ")";
+        this.expectedStr = expectedStr;
+        this.capture = capture;
+        this.threshold = threshold;
+    }
+
+    check() {
+        val image = imageRect(
+            this.capture.x,
+            this.capture.y,
+            this.capture.w,
+            this.capture.h
+        );
+
+        image = processImage(
+            image,
+            this.threshold.r,
+            this.threshold.g,
+            this.threshold.b,
+            this.threshold.range
+        );
+
+        val ocrOut = readImage(image);
+        print ocrOut;
+
+        return ocrOut == this.expectedStr;
+    }
+
+    // Click in center of imaged rectangle.
+    advance() {
+        moveMouse(
+            this.capture.x + this.capture.w / 2,
+            this.capture.y + this.capture.h / 2
+        );
+        leftClick();
+        holup(1);
+    }
+}
+
+class StateMachine {
+    ctor() {
+        print "[" + clock() + "] +StateMachine";
+
+        // Init thresholds
+        val mainMenuThresh = Threshold(255, 255, 255, 10);
+        val playMenuThresh = Threshold(0, 0, 13, 80);
+        val customMenuThresh = Threshold(255, 255, 255, 35);
+
+        // Init Captures
+        val mainMenuCap = Capture(44, 279, 134, 69);
+        val playMenuCap = Capture(1287, 349, 154, 24);
+        val customMenuCap = Capture(1457, 248, 81, 20);
+
+        // TODO: Lists are implemented, but iterating over lists is not..
+        this.mainMenu = State("play", mainMenuCap, mainMenuThresh);
+        this.playMenu = State("custom games", playMenuCap, playMenuThresh);
+        this.customMenu = State("create", customMenuCap, customMenuThresh);
+    }
+
+    test() {
+        if (this.mainMenu.check()) {
+            this.mainMenu.advance();
+            print "nicecock";
+        } else {
+            print ":(";
+        }
+
+        if (this.playMenu.check()) {
+            this.playMenu.advance();
+            print "8==D";
+        } else {
+            print "8--D";
+        }
+
+        if (this.customMenu.check()) {
+            this.customMenu.advance();
+            print "8==D";
+        } else {
+            print "8--D";
+        }
+    }
+}
+
+// Sleep 2 seconds.
+holup(2);
+
+val stateMachine = StateMachine();
+stateMachine.test();
+

@@ -80,6 +80,7 @@ public class Parser {
     }
 
     private Statement statement() {
+        if (match(YOINK)) return yoinkStatement();
         if (match(FOR)) return forStatement();
         if (match(IF)) return ifStatement();
         if (match(PRINT)) return printStatement();
@@ -526,5 +527,11 @@ public class Parser {
         }
 
         return expression;
+    }
+
+    private Statement yoinkStatement() {
+        Token path = consume(STRING, "Expect string after 'yoink'.");
+        consume(SEMICOLON, "Expect ';' after yoink path.");
+        return new Statement.Yoink(path);
     }
 }

@@ -15,6 +15,7 @@ abstract class Statement {
         R visitReturnStatement(Return statement);
         R visitWhileStatement(While statement);
         R visitVarStatement(Var statement);
+        R visitYoinkStatement(Yoink statement);
     }
 
     static class Block extends Statement {
@@ -174,6 +175,18 @@ abstract class Statement {
 
         final Token name;
         final Expression initializer;
+    }
+
+    static class Yoink extends Statement {
+        final Token path;
+        
+        Yoink(Token path) {
+            this.path = path;
+        }
+
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitYoinkStatement(this);
+        }
     }
 
 
